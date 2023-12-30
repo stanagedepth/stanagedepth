@@ -5,6 +5,92 @@ library(stringr)
 library(posterior)
 library(rintcal)
 
+#' @title Some sample age-depth data
+#'
+#' @description `sample_data` returns a data frame of synthetic age-depth data which can be used as an input to the run_model function
+#' @export
+sample_data <- function() {
+  data.frame(
+    label  = c('top', 'd2', 'd3', 'd4', 'd5','d6','d7', 'd8', 'd9', 'bottom'),
+    age = c(395, 485, 613, 595, 743, 809, 848, 887, 990, 1310),
+    error = c(25, 30, 25, 25, 25, 25, 25, 25, 25, 30),
+    depth = c(0.20, 0.26, 0.32, 0.38, 0.44, 0.49, 0.53, 0.57, 0.7, 0.8)
+  )
+}
+
+calibration_curves <- function() {
+  list(
+    IntCal20 = 1
+  )
+}
+
+get_calibrated_date <- function(uncalibrated_age, error, curve = 'IntCal20') {
+  calibrated_distribution <- as.data.frame(caldist(
+    uncalibrated_age,
+    error,
+    calibration_curves()[[curve]],
+    cc.resample = 1
+  ))
+
+  names(calibrated_distribution) <- c('cal_bp', 'prob')
+
+  mean_calibrated_age <- sum(calibrated_distribution$cal_bp * calibrated_distribution$prob)
+
+  squared_deviations <- (calibrated_distribution$cal_bp - mean_calibrated_age)^2
+  weighted_squared_deviations <- squared_deviations * calibrated_distribution$prob
+  sum_ws_deviations <- sum(weighted_squared_deviations)
+  sd_calibrated_age <- sqrt(sum_ws_deviations)
+
+  min_calibrated_age <- min(calibrated_distribution[, 1])
+  max_calibrated_age <- max(calibrated_distribution[, 1])
+
+
+  calibrated_date <- list(
+    calibrated_distribution = calibrated_distribution,
+    uncalibrated_age = uncalibrated_age,
+    age_error = error,
+    mean_calibrated_age = mean_calibrated_age,
+    sd_calibrated_age = sd_calibrated_age,
+    min_calibrated_age = min_calibrated_age,
+    max_calibrated_age = max_calibrated_age
+  )
+
+
+  class(calibrated_date) <- 'calibdate'
+
+  calibrated_date
+}
+
+
+get_date_samples <- function(x, size = 1000) {
+  if (class(x) != 'calibdate') stop('x in get_date_samples not of proper type')
+  sample(x$calibrated_distribution$cal_bp,
+         size = size,
+         replace = TRUE,
+         prob = x$calibrated_distribution$prob)
+}
+
+
+preprocess_input <- function(x, curve = 'IntCal20', samples = 1000) {
+  # Takes an input df containing: label, c14 age, c14 age error, depth;
+  # and adds calibrated dates
+  # Names of data frame to be label, age, error, depth
+  # Added columns are calib_date_mean, calib_sd, calibrated_dist
+  if (any(names(x) != c('label', 'age', 'error', 'depth'))) stop('Names of input not as expected')
+  calib_date_mean <- numeric(nrow(x))
+  calib_date_sd   <- numeric(nrow(x))
+  calibrated_dist <- vector('list', nrow(x))
+  calibrated_dist_samples <- vector('list', nrow(x))
+  for (i in seq_len(nrow(x))) {
+    cdate <- get_calibrated_date(x$age[i], x$error[i], curve)
+    calib_date_mean[i] <- cdate$mean_calibrated_age
+    calib_date_sd[i] <- cdate$sd_calibrated_age
+    calibrated_dist[i] <- list(cdate$calibrated_distribution)
+    calibrated_dist_samples[i] <- list(get_date_samples(cdate, samples))
+  }
+  cbind(x, calib_date_mean, calib_date_sd, I(calibrated_dist), I(calibrated_dist_samples))
+}
+
 
 get_bacon_rates <- function(stan_output, model_depths) {
 
@@ -564,59 +650,25 @@ run_sequential_simple <- function(x, chains = 4, warmup = 1000, iter = 3000) {
   output
 }
 
-run_sequential_mixed <- function(x) {
 
-  stan_model_data <- list(
-    N = nrow(x),
-    num_samples = length(x$calibrated_dist_samples[[1]]),
-    date_samples = t(matrix(unlist(x$calibrated_dist_samples), ncol = length(x$calibrated_dist_samples)))
-  )
-
-  simplex3 <- function() {
-    x <- runif(3, .4, .6)
-    x <- round(x / sum(x), 2)
-    if (1 - sum(x) != 0) x[3] <- x[3] + 1 - sum(x)
-    x
-  }
-
-  simplex_array <- simplex3()
-  for (i in 1:(nrow(x) - 1)) {
-    simplex_array <- cbind(simplex_array, simplex3())
-  }
-
-  initial_param_values <- function(chain_id = 1) {
-    list(
-      mixture_fraction = t(simplex_array),
-      mu1 = x$calib_date_mean,
-      mu2 = x$calib_date_mean,
-      mu3 = x$calib_date_mean,
-      true_sd1 = x$calib_date_sd,
-      true_sd2 = x$calib_date_sd,
-      true_sd3 = x$calib_date_sd
-      )
-    }
-
-  print(initial_param_values())
-
-  numchains <- 1
-
-  model <- stan_model('/cloud/project/stan/sequential_mixed.stan')
-
-  stan_output <- rstan::sampling(
-    object = model,
-    data = stan_model_data,
-    warmup = 2000,
-    iter = 5000,
-    chains = numchains,
-    cores = 1,
-    init = lapply(1:numchains, function(id) initial_param_values(chain_id = id))
-  )
-
-  stan_output
-}
-
-
-
+#' @title Run an age-depth model
+#'
+#' @description Runs the specified age-depth model and returns an object of type `agedepthmodel`
+#' @param x  A data frame containing age depth data
+#' @param model A string specifying the model to be run
+#' @param chains The number of MCMC chains to be run
+#' @param warmup The number of MCMC iterations to be discarded as warmup
+#' @param iter The total number of MCMC iterations
+#' @param modelled_points (Bacon only) the number of points to model. The number of calculated rates is one less that this number.
+#' @param output_points (Bacon only) the number of depths to provide an age for in the output
+#' @param a_alpha (Bacon only) the a input for the alpha (rate) prior
+#' @param b_alpha (Bacon only) the b input for the alpha (rate) prior
+#' @param a_w (Bacon only) the a input for the memory prior
+#' @param b_w (Bacon only) the b input for the memory prior
+#' @param t_df (Bacon only) the number of degrees of freedom for the t-distribution in the likelihood function
+#' @param use_normal (Bacon only) If 1, use the normal distribution instead of the t-distribution in the likelihood
+#'
+#' @export
 run_model <- function(x, model = 'bacon_full', ...) {
   if (model == 'bacon_simple') {
     run_bacon_simple(x, ...)
