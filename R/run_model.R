@@ -5,6 +5,15 @@ library(stringr)
 library(posterior)
 library(rintcal)
 
+
+#' @import rstan
+#' @import dplyr
+#' @import tidyr
+#' @import stringr
+#' @import posterior
+#' @import rintcal
+
+
 #' @title Some sample age-depth data
 #'
 #' @description `sample_data` returns a data frame of synthetic age-depth data which can be used as an input to the run_model function
@@ -25,7 +34,7 @@ calibration_curves <- function() {
 }
 
 get_calibrated_date <- function(uncalibrated_age, error, curve = 'IntCal20') {
-  calibrated_distribution <- as.data.frame(caldist(
+  calibrated_distribution <- as.data.frame(rintcal::caldist(
     uncalibrated_age,
     error,
     calibration_curves()[[curve]],
@@ -673,7 +682,7 @@ run_sequential_simple <- function(x, chains = 4, warmup = 1000, iter = 3000) {
 #' @param use_normal (Bacon only) If 1, use the normal distribution instead of the t-distribution in the likelihood
 #'
 #' @export
-run_model <- function(x, model = 'bacon_full', ...) {
+run_model <- function(x, model = 'bacon_simple', ...) {
   x <- preprocess_input(x)
   if (model == 'bacon_simple') {
     run_bacon_simple(x, ...)

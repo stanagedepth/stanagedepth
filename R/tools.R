@@ -1,6 +1,8 @@
 library(ggplot2)
 library(ggridges)
 
+#' @import ggplot2
+#' @import ggridges
 
 #' @title Predict age for a given depth for an age-depth model
 #'
