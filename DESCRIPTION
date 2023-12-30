@@ -1,12 +1,10 @@
 Package: stanagedepth
-Title: What the Package Does (One Line, Title Case)
+Title: Implementation of a number of age-depth models in stan
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Anon", "Anon", , "elegant.tent4002@fastmail.com", role = c("aut", "cre"))
+Description: An implementation of a number of age-depth models in stan. Submitted as part of the dissertation for the MSc in Statistics at the University of Sheffield.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
