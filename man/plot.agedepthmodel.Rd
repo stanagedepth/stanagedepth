@@ -4,7 +4,7 @@
 \alias{plot.agedepthmodel}
 \title{Plot one or two age-depth models}
 \usage{
-\method{plot}{agedepthmodel}(
+plot.agedepthmodel(
   x,
   y = NULL,
   colours = c("red", "green"),

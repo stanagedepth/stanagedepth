@@ -4,7 +4,7 @@
 \alias{run_model}
 \title{Run an age-depth model}
 \usage{
-run_model(x, model = "bacon_full", ...)
+run_model(x, model = "bacon_simple", ...)
 }
 \arguments{
 \item{x}{A data frame containing age depth data}
@@ -38,4 +38,6 @@ Runs the specified age-depth model and returns an object of type \code{agedepthm
 
 The input data frame should contain four columns: \code{label}, a label for the observation, \code{age}, an uncalibrated C14 age,
 \code{error}, the error of the C14 age and \code{depth}, the depth at which the observation was taken.
+
+The model parameter can take one of the values bacon_simple, uniform_simple, sequential_simple, sequential_full, uniform_full.
 }

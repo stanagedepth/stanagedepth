@@ -667,6 +667,8 @@ run_sequential_simple <- function(x, chains = 4, warmup = 1000, iter = 3000) {
 #' The input data frame should contain four columns: `label`, a label for the observation, `age`, an uncalibrated C14 age,
 #' `error`, the error of the C14 age and `depth`, the depth at which the observation was taken.
 #'
+#' The model parameter can take one of the values bacon_simple, uniform_simple, sequential_simple, sequential_full, uniform_full.
+#'
 #' @param x  A data frame containing age depth data
 #' @param model A string specifying the model to be run
 #' @param chains The number of MCMC chains to be run
