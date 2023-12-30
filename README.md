@@ -4,9 +4,9 @@
 
 These files implement age-depth models in stan, prepared as part of my dissertation for the University of Sheffield's MSc in Statistics.
 
- - OxCal's sequential model
+ - OxCal's sequential model (see https://c14.arch.ox.ac.uk/oxcal.html)
  - OxCal's uniform deposition model
- - Bacon
+ - Bacon (see https://github.com/cran/rbacon)
  
 
 In the case of the Oxcal models, a version using both a normal approximation to calibrated C14 dates, as well as a full version of the C14
