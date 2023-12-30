@@ -191,7 +191,7 @@ run_bacon_simple <- function(x, chains = 4, warmup = 1000, iter = 3000, modelled
     use_normal = use_normal
   )
 
-  model <- stan_model('/cloud/project/stan/bacon.stan')
+  model <- stanmodels$bacon
 
   stan_output <- rstan::sampling(
     object = model,
@@ -399,7 +399,7 @@ run_bacon <- function(x, chains = 4, warmup = 1000, iter = 3000, modelled_points
   )
 
 
-    model_file <- '/cloud/project/stan/bacon_actual_distributions_newstan.stan'
+    model_file <- 'extras/bacon_actual_distributions_newstan.stan'
     cmdstanmodel <- cmdstan_model(model_file)
     cmdstan_output <- cmdstanmodel$sample(
       data = stan_model_data,
@@ -408,7 +408,7 @@ run_bacon <- function(x, chains = 4, warmup = 1000, iter = 3000, modelled_points
       iter_sampling = iter - warmup,
       init = init_values,
       parallel_chains = parallel::detectCores(),
-      output_dir = '/cloud/project/cmdstanoutput/'
+      output_dir = 'cmdstanoutput/'
     )
     stan_output <- rstan::read_stan_csv(cmdstan_output$output_files())
 
@@ -495,7 +495,7 @@ run_uniform_simple <- function(x, chains = 4, warmup = 1500, iter = 4000) {
     age_sd = x$calib_date_sd
   )
 
-  model <- stan_model('/cloud/project/stan/uniform_simple.stan')
+  model <- stanmodels$uniformsimple
 
   stan_output <- rstan::sampling(
     object = model,
@@ -547,7 +547,7 @@ run_uniform_full <- function(x, chains = 4, warmup = 1000, iter = 3000) {
     list(det_ages_dist = x$calib_date_mean)
   }
 
-  model <- stan_model('/cloud/project/stan/uniform_actual_distributions.stan')
+  model <- stanmodels$uniformactualdistributions
 
   stan_output <- rstan::sampling(
     object = model,
@@ -586,7 +586,7 @@ run_sequential_full <- function(x, chains = 4, warmup = 1000, iter = 3000) {
     probs = t(probs_matrix)
   )
 
-  model <- stan_model('/cloud/project/stan/sequential_actual_distributions.stan')
+  model <- stanmodels$sequentialactualdistributions
 
   stan_output <- rstan::sampling(
     object = model,
@@ -622,7 +622,7 @@ run_sequential_simple <- function(x, chains = 4, warmup = 1000, iter = 3000) {
     error = x$calib_date_sd
   )
 
-  model <- stan_model('/cloud/project/stan/sequential_simple.stan')
+  model <- stanmodels$sequentialsimple
 
   stan_output <- rstan::sampling(
     object = model,
