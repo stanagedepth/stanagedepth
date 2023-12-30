@@ -654,6 +654,10 @@ run_sequential_simple <- function(x, chains = 4, warmup = 1000, iter = 3000) {
 #' @title Run an age-depth model
 #'
 #' @description Runs the specified age-depth model and returns an object of type `agedepthmodel`
+#'
+#' The input data frame should contain four columns: `label`, a label for the observation, `age`, an uncalibrated C14 age,
+#' `error`, the error of the C14 age and `depth`, the depth at which the observation was taken.
+#'
 #' @param x  A data frame containing age depth data
 #' @param model A string specifying the model to be run
 #' @param chains The number of MCMC chains to be run
@@ -670,14 +674,13 @@ run_sequential_simple <- function(x, chains = 4, warmup = 1000, iter = 3000) {
 #'
 #' @export
 run_model <- function(x, model = 'bacon_full', ...) {
+  x <- preprocess_input(x)
   if (model == 'bacon_simple') {
     run_bacon_simple(x, ...)
   } else if (model == 'uniform_simple') {
     run_uniform_simple(x, ...)
   } else if (model == 'sequential_simple') {
     run_sequential_simple(x, ...)
-  } else if (model == 'sequential_mixed') {
-    run_sequential_mixed(x, ...)
   } else if (model == 'bacon_full') {
     stop('bacon_full model not supported in this package.')
     run_bacon(x, ...)
