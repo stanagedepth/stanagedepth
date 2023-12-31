@@ -28,12 +28,15 @@ uniform model. To run the OxCal uniform model, OxCal must be installed and the c
 
 ## Usage
 
-In principle it should be possible to install this as a package by first installing the devtools package and then running devtools::install_github('https://github.com/stanagedepth/stanagedepth'). This can be a very slow process (because of the 
-need to recompile the stan files), and sometimes somewhat unreliable. However if it works you will end up with an 
-installed R library called stanagedepth with documented functions:
+In principle it is possible to install this as a package by first installing the devtools package and then running devtools::install_github('https://github.com/stanagedepth/stanagedepth'). This can be a very slow process (because of the 
+need to recompile the stan files). It works relatively reliably in a posit.cloud R session. However if it works you will end up with an installed R library called stanagedepth with documented functions:
 
  - sample_data() will return a dataframe containing the sample data used in my "usage" chapter.
  - run_model() takes a data frame and a string specifying the model to be run: one of sequential_simple, uniform_simple, bacon_simple, sequential_full, uniform_full or (not working directly) bacon_full.
+ - plot.agedepthstan() will plot age depth models. Just using plot() should work, but has issues - I think the generic function is wrongly being called.
+ - predict() does work
+
+Help for all of these can be accessed in the usual way using ?agedepthstan::run_model or ?run_model if the library has been loaded using library(agedepthstan).
 
 Alternatively, it should be possible to install the stan and R files separately. It would be necessary to replace the references to the 
 stanmodels object with a call to rstan::stan_model to compile and load the models.
