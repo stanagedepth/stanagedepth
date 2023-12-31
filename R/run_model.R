@@ -683,8 +683,13 @@ run_sequential_simple <- function(x, chains = 4, warmup = 1000, iter = 3000) {
 #' @param t_df (Bacon only) the number of degrees of freedom for the t-distribution in the likelihood function
 #' @param use_normal (Bacon only) If 1, use the normal distribution instead of the t-distribution in the likelihood
 #'
+#' @examples
+#' # run_model(sample_data, 'bacon_simple', modelled_points = 7, a_alpha = 140, b_alpha = 0.1, a_w = 5, b_w = 5, t_df = 3)
+#' # run_model(MSB2K, 'bacon_simple', modelled_points = 21, a_alpha = 1.5, b_alpha = 0.075, a_2 = 5, b_w = 5, t_df = 3)
+#'
 #' @export
-run_model <- function(x, model = 'bacon_simple', ...) {
+run_model <- function(x, model = c('uniform_simple', 'bacon_simple', 'sequential_simple', 'sequential_full', 'uniform_full', 'bacon_full'), ...) {
+  model <- match.arg(model)
   x <- preprocess_input(x)
   if (model == 'bacon_simple') {
     run_bacon_simple(x, ...)

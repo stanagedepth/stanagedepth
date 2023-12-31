@@ -4,7 +4,12 @@
 \alias{run_model}
 \title{Run an age-depth model}
 \usage{
-run_model(x, model = "bacon_simple", ...)
+run_model(
+  x,
+  model = c("uniform_simple", "bacon_simple", "sequential_simple", "sequential_full",
+    "uniform_full", "bacon_full"),
+  ...
+)
 }
 \arguments{
 \item{x}{A data frame containing age depth data}
@@ -40,4 +45,9 @@ The input data frame should contain four columns: \code{label}, a label for the 
 \code{error}, the error of the C14 age and \code{depth}, the depth at which the observation was taken.
 
 The model parameter can take one of the values bacon_simple, uniform_simple, sequential_simple, sequential_full, uniform_full.
+}
+\examples{
+# run_model(sample_data, 'bacon_simple', modelled_points = 7, a_alpha = 140, b_alpha = 0.1, a_w = 5, b_w = 5, t_df = 3)
+# run_model(MSB2K, 'bacon_simple', modelled_points = 21, a_alpha = 1.5, b_alpha = 0.075, a_2 = 5, b_w = 5, t_df = 3)
+
 }

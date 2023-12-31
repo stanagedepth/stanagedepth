@@ -108,3 +108,7 @@ plot.agedepthmodel <- function(x,
   agedepth
 
 }
+
+
+.S3method('plot', 'agedepthmodel')
+.S3method('predict', 'agedepthmodel')
