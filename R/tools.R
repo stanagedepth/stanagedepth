@@ -6,7 +6,7 @@ library(ggridges)
 
 #' @title Predict age for a given depth for an age-depth model
 #'
-#' @description Use the input value to determine the age at a given depth.
+#' @description Use the input value to determine the age at a given depth, within the depths specified in the model.
 #' @param x An object of type `agedepthmodel`
 #' @param depth The depth at which the age is required
 #' @return A named vector containing the mean age according to the model, together with the minimum and maximum values (95% HDI)
@@ -19,7 +19,8 @@ predict.agedepthmodel <- function(x, depth) {
     return(NULL)
   }
   if(depth < min(x$output_ages$depth) || depth > max(x$output_ages$depth)) {
-    warning(paste0('predict.agedepthmodel: depth ', depth, ' out of model range'))
+    warning(paste0('predict.agedepthmodel: depth ', depth, ' out of model range. Must be between ', min(x$output_ages$depth), ' and ', max(x$output_ages$depth)))
+    return(NULL)
   }
 
   min  <- approx(x$output_ages$depth, x$output_ages$min, depth)$y

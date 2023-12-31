@@ -15,5 +15,5 @@
 A named vector containing the mean age according to the model, together with the minimum and maximum values (95\% HDI)
 }
 \description{
-Use the input value to determine the age at a given depth.
+Use the input value to determine the age at a given depth, within the depths specified in the model.
 }
